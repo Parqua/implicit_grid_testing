@@ -1,3 +1,6 @@
+#ifndef GRID_STORAGE__HPP_
+#define GRID_STORAGE__HPP_
+
 #include "axom/spin.hpp"
 #include "axom/core.hpp"
 #include "axom/primal.hpp"
@@ -46,3 +49,5 @@ private:
     std::vector<Tri2d> 2d_tstor;
     std::vector<Tri3d> 3d_tstor;
 }; 
+
+#endif 
