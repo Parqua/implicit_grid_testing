@@ -27,3 +27,26 @@ set_target_properties(rig PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(gridTime PUBLIC
                             "${PROJECT_BINARY_DIR}"
                             "${PROJECT_SOURCE_DIR}/rig")
+
+set(ENABLE_CUDA ON CACHE BOOL "")
+
+set(RAJA_ENABLE_CUDA ON CACHE BOOL "")
+
+set(CUDA_TOOLKIT_ROOT_DIR "/usr/tce/packages/cuda/cuda-10.1.243" CACHE PATH "")
+
+set(CMAKE_CUDA_COMPILER "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc" CACHE PATH "")
+
+set(CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")
+
+set(AXOM_ENABLE_ANNOTATIONS ON CACHE BOOL "")
+
+set(AXOM_ENABLE_CUB OFF CACHE BOOL "")
+
+set(AXOM_CUDA_ARCH "sm_60" CACHE PATH "")
+
+set(CMAKE_CUDA_FLAGS "-restrict -arch ${AXOM_CUDA_ARCH} -std=c++11 --expt-extended-lambda -G " CACHE PATH "")
+
+set(CMAKE_CUDA_HOST_COMPILER "${MPI_CXX_COMPILER}" CACHE PATH "")
+
+# nvcc does not like gtest's 'pthreads' flag
+set(gtest_disable_pthreads ON CACHE BOOL "")
