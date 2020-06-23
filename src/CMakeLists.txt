@@ -7,8 +7,10 @@ set(CUDA_TOOLKIT_ROOT_DIR "/usr/tce/packages/cuda/cuda-10.1.243" CACHE PATH "")
 set(CMAKE_CUDA_COMPILER "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc" CACHE PATH "")
 set(CUDA_ARCH "sm_60" CACHE STRING "")
 set(CMAKE_CUDA_FLAGS "-restrict -arch ${CUDA_ARCH} -std=c++11" CACHE STRING "")
+set(CMAKE_CUDA_LINK_FLAGS "-Xlinker -rpath -Xlinker /usr/tce/packages/spectrum-mpi/ibm/spectrum-mpi-rolling-release/lib" CACHE STRING "")
 set(CUDA_LINK_WITH_NVCC ON CACHE BOOL "")
-
+set(CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")
+set(gtest_disable_pthreads ON CACHE BOOL "")
 
 project(gridTime CXX C CUDA)
 set(ENABLE_CUDA ON CACHE BOOL "")
