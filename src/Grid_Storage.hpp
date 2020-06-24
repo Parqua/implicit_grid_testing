@@ -138,7 +138,7 @@ class GridStorage {
         void genTriangles3d(int tricount, double bmax){
             Point3d p[3];
             double size_per_tri = bmax/cbrt(tricount);
-
+/*
             for(int i = 0; i < (int)cbrt(tricount); i++){
                 for(int j = 0; j < (int)cbrt(tricount); j++){
                     for(int k = 0; k < (int)cbrt(tricount); k++){
@@ -150,7 +150,12 @@ class GridStorage {
                     }
                 }
             }
-
+*/
+        p[0] = Point3d::make_point(70, 70, 70);
+        p[1] = Point3d::make_point(80,70,70);
+        p[2] = Point3d::make_point(90, 80, 90);
+        Tri3d t(p[0], p[1], p[2]);
+        three_tstor.push_back(t);
         }
     private:
         ImpGrid2d two_stor;
