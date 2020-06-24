@@ -12,11 +12,11 @@
 
 constexpr int in3D = 3;
 constexpr int in2D = 2;
-using ImpGrid2d = axom::spin::ImplicitGrid_Accel<in2D>;
+using ImpGrid2d = axom::spin::ImplicitGrid<in2D>;
 using BBox2d = axom::primal::BoundingBox<double, in2D>;
 using Tri2d = axom::primal::Triangle<double, in2D>;
 using Point2d = axom::primal::Point<double, in2D>;
-using ImpGrid3d = axom::spin::ImplicitGrid_Accel<in3D>;
+using ImpGrid3d = axom::spin::ImplicitGrid<in3D>;
 using BBox3d = axom::primal::BoundingBox<double, in3D>;
 using Tri3d = axom::primal::Triangle<double, in3D>;
 using Point3d = axom::primal::Point<double, in3D>;
@@ -32,10 +32,10 @@ class GridStorage {
 
             if(dim == 2){
                 objcount *= objcount;               
-                double extents[2] = {bmax, bmax};
-                double eytents[2] = {bmax, bmax};
+                double mins[2] = {0, 0};
+                double maxes[2] = {bmax, bmax};
                 int real_res[2] = {cellcount, cellcount};
-                two_stor = ImpGrid2d(extents, eytents, real_res, objcount);
+                two_stor = ImpGrid2d(mins, maxes, real_res, objcount);
                 genTriangles2d(objcount, bmax);
                 genBboxes2d();
                 for(int i =0; i<two_bstor.size(); i++){
@@ -45,13 +45,14 @@ class GridStorage {
             }
             else if(dim == 3){
                 objcount*= objcount * objcount;
-                double extents[3] = {bmax, bmax, bmax};
-                double eytents[3] = {bmax, bmax, bmax};
+                double mins[3] = {0, 0, 0};
+                double maxes[3] = {bmax, bmax, bmax};
                 int real_res[3] = {cellcount, cellcount, cellcount};
-                three_stor = ImpGrid3d(extents, eytents, real_res, objcount);
+                three_stor = ImpGrid3d(mins, maxes, real_res, objcount);
                 genTriangles3d(objcount, bmax);
                 genBboxes3d();
                 for(int i =0; i<three_bstor.size(); i++){
+                    printf("Inserting:");
                     three_bstor[i].print(std::cout);
                     three_stor.insert(three_bstor[i], i);
                 }   
@@ -65,17 +66,18 @@ class GridStorage {
         void basic3dTest(){
             BBox3d tester;
             Point3d p[2];
-            //p[0] = Point3d::make_point(random_real(0.0, m_size/2), random_real(0.0, m_size/2), random_real(0.0, m_size/2));
+            //p[0] = Point3d::make_point(random_real(8.0, m_size/2), random_real(0.0, m_size/2), random_real(0.0, m_size/2));
             //p[1] = Point3d::make_point(random_real(m_size/2, m_size), random_real(m_size/2, m_size), random_real(m_size/2, m_size));
-            p[0] = Point3d::make_point(0, 0, 0);    
-            p[1] = Point3d::make_point(m_size-1, m_size-1, m_size-1);
-            printf("test zone %f\n", m_size);
+            p[0] = Point3d::make_point(0, 0, 0);
+            p[1] = Point3d::make_point(10, 10, 10);
+            //Current 3d tester is this point.    
+            Point3d ptest = Point3d::make_point(4, 2, 6);
             tester.addPoint(p[0]);
             tester.addPoint(p[1]);
-            BitSet b = three_stor.getCandidates(tester);
-            printf("%d extra test\n", three_stor.getCandidates(tester).find_first());
+            
+            BitSet b = three_stor.getCandidates(ptest);
             int idx = b.find_first();
-            printf("%d, %d\n", b.size(), b.count());
+            printf("%d\n", idx); 
             while((idx =b.find_next(idx)) != BitSet::npos){
                 printf("%d\n", idx); 
             }          
@@ -140,7 +142,6 @@ class GridStorage {
             for(int i = 0; i < (int)cbrt(tricount); i++){
                 for(int j = 0; j < (int)cbrt(tricount); j++){
                     for(int k = 0; k < (int)cbrt(tricount); k++){
-
                         p[0] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
                         p[1] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
                         p[2] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
