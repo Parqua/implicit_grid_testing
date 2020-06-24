@@ -1,6 +1,7 @@
 #ifndef GRID_STORAGE__HPP_
 #define GRID_STORAGE__HPP_
 
+#include <cmath>
 #include "axom/spin.hpp"
 #include "axom/core.hpp"
 #include "axom/primal.hpp"
@@ -24,12 +25,18 @@ class GridStorage {
 
         GridStorage(double bmax, int objcount, int cellcount, int dim){
             dimcount = dim;
+            objcount *= objcount;
             if(dim == 2){
                 double extents[2] = {bmax, bmax};
                 double eytents[2] = {bmax, bmax};
                 int real_res[2] = {cellcount, cellcount};
                 two_stor = ImpGrid2d(extents, eytents, real_res, objcount);
                 genTriangles2d(objcount, bmax);
+                genBboxes2d();
+                for(int i =0; i<two_bstor.size(); i++){
+                    two_stor.insert(two_bstor[i], i);
+                }   
+                fprintf(stderr, "%d\n", two_stor.numIndexElements());     
             }
             else if(dim == 3){
                 double extents[3] = {bmax, bmax, bmax};
@@ -45,17 +52,32 @@ class GridStorage {
         void genTriangles2d(int tricount, double bmax){
         Point2d p[3];
             double size_per_tri = bmax/(tricount*2);
-            for(int i = 0; i < tricount/2; i++){
-                for(int j= 0; j < tricount/2; j++){
-                    p[0] = Point2d::make_point(random_real(i*size_per_tri, (i*size_per_tri+1)),random_real(j*size_per_tri,j*(size_per_tri+1)));
-                    p[1] = Point2d::make_point(random_real(i*size_per_tri, (i*size_per_tri+1)),random_real(j*size_per_tri,j*(size_per_tri+1))); 
-                    p[2] = Point2d::make_point(random_real(i*size_per_tri, (i*size_per_tri+1)),random_real(j*size_per_tri,j*(size_per_tri+1))); 
+            for(int i = 0; i < sqrt(tricount); i++){
+               for(int j = 0; j < sqrt(tricount); j++){
+                    p[0] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri));
+                    p[1] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri));
+                    p[2] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
                     Tri2d t(p[0], p[1], p[2]);
                     two_tstor.push_back(t);
-                }
+                   
+               }
             }
         }
 
+        inline BBox2d findBbox(Tri2d tri){
+            BBox2d bbox;
+            bbox.addPoint(tri[0]);
+            bbox.addPoint(tri[1]);
+            bbox.addPoint(tri[2]); 
+            return bbox;
+        }
+
+        void genBboxes2d(){
+            for(int i = 0; i < two_tstor.size(); i++){
+                two_bstor.push_back(findBbox(two_tstor[i]));
+               }        
+
+        }
         void genTriangles3d(int tricount, double bmax){
 
         }
