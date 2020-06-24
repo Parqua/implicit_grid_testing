@@ -1,10 +1,12 @@
 #ifndef GRID_STORAGE__HPP_
 #define GRID_STORAGE__HPP_
 
+#include <iostream>
 #include <cmath>
 #include "axom/spin.hpp"
 #include "axom/core.hpp"
 #include "axom/primal.hpp"
+#include "axom/slam.hpp"
 
 #include <vector>
 
@@ -18,6 +20,7 @@ using ImpGrid3d = axom::spin::ImplicitGrid_Accel<in3D>;
 using BBox3d = axom::primal::BoundingBox<double, in3D>;
 using Tri3d = axom::primal::Triangle<double, in3D>;
 using Point3d = axom::primal::Point<double, in3D>;
+using BitSet = axom::slam::BitSet;
 using namespace axom::utilities;
 
 class GridStorage {
@@ -25,7 +28,7 @@ class GridStorage {
 
         GridStorage(double bmax, int objcount, int cellcount, int dim){
             dimcount = dim;
-            
+            m_size=bmax;
 
             if(dim == 2){
                 objcount *= objcount;               
@@ -38,7 +41,7 @@ class GridStorage {
                 for(int i =0; i<two_bstor.size(); i++){
                     two_stor.insert(two_bstor[i], i);
                 }   
-                fprintf(stderr, "%d\n", two_stor.numIndexElements());     
+
             }
             else if(dim == 3){
                 objcount*= objcount * objcount;
@@ -49,28 +52,51 @@ class GridStorage {
                 genTriangles3d(objcount, bmax);
                 genBboxes3d();
                 for(int i =0; i<three_bstor.size(); i++){
+                    three_bstor[i].print(std::cout);
                     three_stor.insert(three_bstor[i], i);
                 }   
-                fprintf(stderr, "%d\n", three_stor.numIndexElements());     
+
 
             }
 
         }
 
+
+        void basic3dTest(){
+            BBox3d tester;
+            Point3d p[2];
+            //p[0] = Point3d::make_point(random_real(0.0, m_size/2), random_real(0.0, m_size/2), random_real(0.0, m_size/2));
+            //p[1] = Point3d::make_point(random_real(m_size/2, m_size), random_real(m_size/2, m_size), random_real(m_size/2, m_size));
+            p[0] = Point3d::make_point(0, 0, 0);    
+            p[1] = Point3d::make_point(m_size-1, m_size-1, m_size-1);
+            printf("test zone %f\n", m_size);
+            tester.addPoint(p[0]);
+            tester.addPoint(p[1]);
+            BitSet b = three_stor.getCandidates(tester);
+            int idx = b.find_first();
+            printf("%d, %d\n", b.size(), b.count());
+            while((idx =b.find_next(idx)) != BitSet::npos){
+                printf("%d\n", idx); 
+            }          
+        }
+        void basic2dTest(){
+
+        }
     private:
 
         void genTriangles2d(int tricount, double bmax){
-        Point2d p[3];
+            Point2d p[3];
             double size_per_tri = bmax/(tricount*2);
             for(int i = 0; i < sqrt(tricount); i++){
-               for(int j = 0; j < sqrt(tricount); j++){
+                for(int j = 0; j < sqrt(tricount); j++){
                     p[0] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri));
                     p[1] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri));
                     p[2] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
+
                     Tri2d t(p[0], p[1], p[2]);
                     two_tstor.push_back(t);
-                   
-               }
+
+                }
             }
         }
 
@@ -85,7 +111,7 @@ class GridStorage {
         void genBboxes2d(){
             for(int i = 0; i < two_tstor.size(); i++){
                 two_bstor.push_back(findBbox(two_tstor[i]));
-               }        
+            }        
 
         }
 
@@ -93,6 +119,7 @@ class GridStorage {
 
         inline BBox3d findBbox(Tri3d tri){
             BBox3d bbox;
+
             bbox.addPoint(tri[0]);
             bbox.addPoint(tri[1]);
             bbox.addPoint(tri[2]); 
@@ -102,22 +129,24 @@ class GridStorage {
         void genBboxes3d(){
             for(int i = 0; i < three_tstor.size(); i++){
                 three_bstor.push_back(findBbox(three_tstor[i]));
-               }        
+            }        
 
         }
         void genTriangles3d(int tricount, double bmax){
             Point3d p[3];
-            double size_per_tri = bmax/(tricount*2);
-            for(int i = 0; i < cbrt(tricount); i++){
-               for(int j = 0; j < cbrt(tricount); j++){
-                    for(int k = 0; k < cbrt(tricount); k++){
-                    p[0] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
-                    p[1] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
-                    p[2] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
-                    Tri3d t(p[0], p[1], p[2]);
-                    three_tstor.push_back(t);
-                   }
-               }
+            double size_per_tri = bmax/cbrt(tricount);
+
+            for(int i = 0; i < (int)cbrt(tricount); i++){
+                for(int j = 0; j < (int)cbrt(tricount); j++){
+                    for(int k = 0; k < (int)cbrt(tricount); k++){
+
+                        p[0] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
+                        p[1] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
+                        p[2] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
+                        Tri3d t(p[0], p[1], p[2]);
+                        three_tstor.push_back(t);
+                    }
+                }
             }
 
         }
@@ -125,6 +154,8 @@ class GridStorage {
         ImpGrid2d two_stor;
         ImpGrid3d three_stor;
         int dimcount;
+        double m_size;
+
 
         std::vector<BBox3d> three_bstor;
         std::vector<BBox2d> two_bstor;
