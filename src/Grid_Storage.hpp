@@ -144,7 +144,7 @@ class GridStorage {
                     for(int k = 0; k < (int)cbrt(tricount); k++){
                         p[0] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
                         p[1] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
-                        p[2] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
+                        p[2] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri)); 
                         Tri3d t(p[0], p[1], p[2]);
                         three_tstor.push_back(t);
                     }
