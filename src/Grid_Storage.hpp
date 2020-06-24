@@ -73,6 +73,7 @@ class GridStorage {
             tester.addPoint(p[0]);
             tester.addPoint(p[1]);
             BitSet b = three_stor.getCandidates(tester);
+            printf("%d extra test\n", three_stor.getCandidates(tester).find_first());
             int idx = b.find_first();
             printf("%d, %d\n", b.size(), b.count());
             while((idx =b.find_next(idx)) != BitSet::npos){
