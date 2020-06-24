@@ -3,6 +3,7 @@
 
 int main(){
     std::cout << "Hellowworld\n";
-    GridStorage g(20, 50, 30, 2); 
+    GridStorage g(20, 50, 30, 3);
+    
     return 43;
 }

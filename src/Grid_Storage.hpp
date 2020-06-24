@@ -25,8 +25,10 @@ class GridStorage {
 
         GridStorage(double bmax, int objcount, int cellcount, int dim){
             dimcount = dim;
-            objcount *= objcount;
+            
+
             if(dim == 2){
+                objcount *= objcount;               
                 double extents[2] = {bmax, bmax};
                 double eytents[2] = {bmax, bmax};
                 int real_res[2] = {cellcount, cellcount};
@@ -39,10 +41,18 @@ class GridStorage {
                 fprintf(stderr, "%d\n", two_stor.numIndexElements());     
             }
             else if(dim == 3){
+                objcount*= objcount * objcount;
                 double extents[3] = {bmax, bmax, bmax};
                 double eytents[3] = {bmax, bmax, bmax};
                 int real_res[3] = {cellcount, cellcount, cellcount};
                 three_stor = ImpGrid3d(extents, eytents, real_res, objcount);
+                genTriangles3d(objcount, bmax);
+                genBboxes3d();
+                for(int i =0; i<three_bstor.size(); i++){
+                    three_stor.insert(three_bstor[i], i);
+                }   
+                fprintf(stderr, "%d\n", three_stor.numIndexElements());     
+
             }
 
         }
@@ -78,7 +88,37 @@ class GridStorage {
                }        
 
         }
+
+
+
+        inline BBox3d findBbox(Tri3d tri){
+            BBox3d bbox;
+            bbox.addPoint(tri[0]);
+            bbox.addPoint(tri[1]);
+            bbox.addPoint(tri[2]); 
+            return bbox;
+        }
+
+        void genBboxes3d(){
+            for(int i = 0; i < three_tstor.size(); i++){
+                three_bstor.push_back(findBbox(three_tstor[i]));
+               }        
+
+        }
         void genTriangles3d(int tricount, double bmax){
+            Point3d p[3];
+            double size_per_tri = bmax/(tricount*2);
+            for(int i = 0; i < cbrt(tricount); i++){
+               for(int j = 0; j < cbrt(tricount); j++){
+                    for(int k = 0; k < cbrt(tricount); k++){
+                    p[0] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
+                    p[1] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(k*size_per_tri,(1+k)*size_per_tri));
+                    p[2] = Point3d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri)); 
+                    Tri3d t(p[0], p[1], p[2]);
+                    three_tstor.push_back(t);
+                   }
+               }
+            }
 
         }
     private:
