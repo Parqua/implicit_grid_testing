@@ -29,7 +29,7 @@ class GridStorage {
         GridStorage(double bmax, int objcount, int cellcount, int dim){
             dimcount = dim;
             m_size=bmax;
-
+            printf("%d\n\n\n", cellcount);
             if(dim == 2){
                 objcount *= objcount;               
                 double mins[2] = {0, 0};
@@ -52,8 +52,8 @@ class GridStorage {
                 genTriangles3d(objcount, bmax);
                 genBboxes3d();
                 for(int i =0; i<three_bstor.size(); i++){
-                    printf("Inserting:");
-                    three_bstor[i].print(std::cout);
+                   // printf("Inserting:");
+                   // three_bstor[i].print(std::cout);
                     three_stor.insert(three_bstor[i], i);
                 }   
 
@@ -74,12 +74,14 @@ class GridStorage {
             Point3d ptest = Point3d::make_point(4, 2, 6);
             tester.addPoint(p[0]);
             tester.addPoint(p[1]);
-            
+            if(!three_stor.isInitialized()){
+                printf("The grid wasn't there.");
+        } 
             BitSet b = three_stor.getCandidates(ptest);
             int idx = b.find_first();
-            printf("%d\n", idx); 
+            printf("\nCount and Set:%d, %d\n", b.count(), idx); 
             while((idx =b.find_next(idx)) != BitSet::npos){
-                printf("%d\n", idx); 
+                printf("Set:%d\n", idx); 
             }          
         }
         void basic2dTest(){
