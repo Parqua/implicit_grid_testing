@@ -80,7 +80,7 @@ class GridStorage {
         void basic2dTest(){
             BBox2d tester;
             Point2d p[2];
-            p[0] = Point2d::make_point(random_real(8.0, m_size/2), random_real(0.0, m_size/2));
+            p[0] = Point2d::make_point(random_real(0.0, m_size/2), random_real(0.0, m_size/2));
             p[1] = Point2d::make_point(random_real(m_size/2, m_size), random_real(m_size/2, m_size));
             tester.addPoint(p[0]);
             tester.addPoint(p[1]);
@@ -98,7 +98,7 @@ class GridStorage {
 
         void genTriangles2d(int tricount, double bmax){
             Point2d p[3];
-            double size_per_tri = bmax/(tricount*2);
+            double size_per_tri = bmax/sqrt(tricount);
             for(int i = 0; i < sqrt(tricount); i++){
                 for(int j = 0; j < sqrt(tricount); j++){
                     p[0] = Point2d::make_point(random_real(i*size_per_tri, (1+i)*size_per_tri),random_real(j*size_per_tri,(1+j)*size_per_tri));
@@ -159,8 +159,8 @@ class GridStorage {
                     }
                 }
             }
-        Tri3d t(p[0], p[1], p[2]);
-        three_tstor.push_back(t);
+
+
         }
     private:
         ImpGrid2d two_stor;
