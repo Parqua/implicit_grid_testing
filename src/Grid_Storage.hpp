@@ -29,7 +29,6 @@ class GridStorage {
         GridStorage(double bmax, int objcount, int cellcount, int dim){
             dimcount = dim;
             m_size=bmax;
-            printf("%d\n\n\n", cellcount);
             if(dim == 2){
                 objcount *= objcount;               
                 double mins[2] = {0, 0};
@@ -52,9 +51,7 @@ class GridStorage {
                 genTriangles3d(objcount, bmax);
                 genBboxes3d();
                 for(int i =0; i<three_bstor.size(); i++){
-                   // printf("Inserting:");
-                   // three_bstor[i].print(std::cout);
-                    three_stor.insert(three_bstor[i], i);
+                   three_stor.insert(three_bstor[i], i);
                 }   
 
 
@@ -66,18 +63,14 @@ class GridStorage {
         void basic3dTest(){
             BBox3d tester;
             Point3d p[2];
-            //p[0] = Point3d::make_point(random_real(8.0, m_size/2), random_real(0.0, m_size/2), random_real(0.0, m_size/2));
-            //p[1] = Point3d::make_point(random_real(m_size/2, m_size), random_real(m_size/2, m_size), random_real(m_size/2, m_size));
-            p[0] = Point3d::make_point(0, 0, 0);
-            p[1] = Point3d::make_point(10, 10, 10);
-            //Current 3d tester is this point.    
-            Point3d ptest = Point3d::make_point(4, 2, 6);
+            p[0] = Point3d::make_point(random_real(8.0, m_size/2), random_real(0.0, m_size/2), random_real(0.0, m_size/2));
+            p[1] = Point3d::make_point(random_real(m_size/2, m_size), random_real(m_size/2, m_size), random_real(m_size/2, m_size));
             tester.addPoint(p[0]);
             tester.addPoint(p[1]);
             if(!three_stor.isInitialized()){
                 printf("The grid wasn't there.");
         } 
-            BitSet b = three_stor.getCandidates(ptest);
+            BitSet b = three_stor.getCandidates(tester);
             int idx = b.find_first();
             printf("\nCount and Set:%d, %d\n", b.count(), idx); 
             while((idx =b.find_next(idx)) != BitSet::npos){
@@ -85,7 +78,21 @@ class GridStorage {
             }          
         }
         void basic2dTest(){
-
+            BBox2d tester;
+            Point2d p[2];
+            p[0] = Point2d::make_point(random_real(8.0, m_size/2), random_real(0.0, m_size/2));
+            p[1] = Point2d::make_point(random_real(m_size/2, m_size), random_real(m_size/2, m_size));
+            tester.addPoint(p[0]);
+            tester.addPoint(p[1]);
+            if(!two_stor.isInitialized()){
+                printf("The grid wasn't there.");
+            } 
+            BitSet b = two_stor.getCandidates(tester);
+            int idx = b.find_first();
+            printf("\nCount and Set:%d, %d\n", b.count(), idx); 
+            while((idx =b.find_next(idx)) != BitSet::npos){
+                printf("Set:%d\n", idx); 
+            }
         }
     private:
 
@@ -140,7 +147,7 @@ class GridStorage {
         void genTriangles3d(int tricount, double bmax){
             Point3d p[3];
             double size_per_tri = bmax/cbrt(tricount);
-/*
+
             for(int i = 0; i < (int)cbrt(tricount); i++){
                 for(int j = 0; j < (int)cbrt(tricount); j++){
                     for(int k = 0; k < (int)cbrt(tricount); k++){
@@ -152,10 +159,6 @@ class GridStorage {
                     }
                 }
             }
-*/
-        p[0] = Point3d::make_point(70, 70, 70);
-        p[1] = Point3d::make_point(80,70,70);
-        p[2] = Point3d::make_point(90, 80, 90);
         Tri3d t(p[0], p[1], p[2]);
         three_tstor.push_back(t);
         }
